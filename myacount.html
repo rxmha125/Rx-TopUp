@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #1877f2;
+        }
+        p {
+            color: #606770;
+            line-height: 24px;
+        }
+        .logout-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        #userInfo {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Account</h1>
+        <div id="userInfo"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyC3taGFE2N-kU-IPDzkkltLRL6BX4TsH6Y",
+          authDomain: "hack-69fc0.firebaseapp.com",
+          projectId: "hack-69fc0",
+          storageBucket: "hack-69fc0.appspot.com",
+          messagingSenderId: "321585324370",
+          appId: "1:321585324370:web:ecd28cc32038508d46da8b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        auth.onAuthStateChanged((user) => {
+            console.log("User state changed:", user);
+            if (user) {
+                const userId = user.email.replace('.', ',');
+                console.log("Fetching data for user ID:", userId);
+                const userRef = ref(db, 'users/' + userId);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        console.log("User data retrieved:", userData);
+                        document.getElementById('userInfo').innerHTML = `
+                            <p>Name: ${userData.firstName} ${userData.lastName}</p>
+                            <p>Email: ${userData.email}</p>
+                        `;
+                    } else {
+                        console.log("No data found for user.");
+                        document.getElementById('userInfo').innerHTML = 'No user data found.';
+                    }
+                }).catch((error) => {
+                    console.error('Error fetching user data:', error);
+                });
+            } else {
+                console.log("No user is signed in.");
+                document.getElementById('userInfo').innerHTML = 'User not logged in.';
+            }
+        });
+    </script>
+</body>
+</html>
