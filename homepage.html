@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rx-Top-Up</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #0056b3;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .packages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .package {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .package:hover {
+            background-color: #eef0f2;
+            transform: translateY(-5px);
+        }
+        .package h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .package span {
+            font-size: 16px;
+            color: #555;
+        }
+        button {
+            padding: 12px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+        }
+        @media (max-width: 768px) {
+            .packages {
+                flex-direction: column;
+            }
+        }
+        .payment-section {
+            margin-top: 15px;
+        }
+        .payment-section label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .payment-section input {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Rx-Top-Up Service
+    </header>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#" id="MyAccountBtn">My Account</a>
+        <a href="/topup website/log-in system/login.html">Logout</a>
+    </nav>
+    <div class="container">
+        <h1>Top-Up Your Account</h1>
+        <form>
+            <label for="gameID">Enter Your Free Fire Player ID</label>
+            <input type="text" id="gameID" placeholder="Player ID" required>
+
+            <label for="game">Select Game</label>
+            <select id="game" required>
+                <option value="freefire">Free Fire</option>
+                <option value="pubg">PUBG</option>
+            </select>
+
+            <label>Select a Package</label>
+            <div class="packages">
+                <div class="package">
+                    <h3>100 Diamonds</h3>
+                    <span>$1.00</span>
+                </div>
+                <div class="package">
+                    <h3>500 Diamonds</h3>
+                    <span>$5.00</span>
+                </div>
+                <div class="package">
+                    <h3>1000 Diamonds</h3>
+                    <span>$10.00</span>
+                </div>
+            </div>
+            
+            <div class="payment-section">
+                <label for="bkashPhoneNumber">Enter your bKash Phone Number</label>
+                <input type="text" id="bkashPhoneNumber" placeholder="01XXXXXXXXX" required>
+                
+                <label for="amount">Enter Amount (BDT)</label>
+                <input type="number" id="amount" placeholder="Enter amount" required>
+                
+                <button type="button" onclick="processBkashPayment()">Pay with bKash</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function validatePhoneNumber(phoneNumber) {
+            const phoneRegex = /^01[3-9]\d{8}$/; // Bangladesh mobile number format
+            return phoneRegex.test(phoneNumber);
+        }
+
+        async function initiatePayment(phoneNumber, amount) {
+            const API_URL = "https://sandbox.bkash.com/payment/initiate"; // Replace with the actual API URL
+            const MERCHANT_ID = "YOUR_MERCHANT_ID"; // Add your Merchant ID
+            const API_SECRET = "YOUR_API_SECRET"; // Add your API Secret
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${btoa(`${MERCHANT_ID}:${API_SECRET}`)}`,
+                },
+                body: JSON.stringify({
+                    phoneNumber: phoneNumber,
+                    amount: amount,
+                    // Additional parameters based on your needs
+                }),
+            });
+
+            const data = await response.json();
+            console.log('Payment Initiation Response:', data);
+            if (data.success) {
+                alert('Payment successful!'); // Handle successful payment
+            } else {
+                alert('Payment failed: ' + data.message); // Handle payment failure
+            }
+        }
+
+        function processBkashPayment() {
+            const phoneNumber = document.getElementById('bkashPhoneNumber').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!validatePhoneNumber(phoneNumber)) {
+                alert('Invalid bKash number');
+                return;
+            }
+
+            if (amount && phoneNumber) {
+                initiatePayment(phoneNumber, amount); // Call the payment initiation function
+            } else {
+                alert('Please fill in all the fields.');
+            }
+        }
+        document.getElementById('MyAccountBtn').addEventListener('click', function() {
+  window.location.href = '/topup website /My acount /myacount.html';
+});
+
+    </script>
+</body>
+</html>
